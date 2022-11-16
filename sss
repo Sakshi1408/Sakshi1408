@@ -1,0 +1,239 @@
+Slip 1
+Q1.)DFS:
+graph1 = {
+ 'A': set(['B', 'C']),
+ 'B': set(['A', 'D', 'E']),
+ 'C': set(['A', 'F']),
+ 'D': set(['B']),
+ 'E': set(['B', 'F']),
+ 'F': set(['C', 'E'])
+ }
+def dfs(graph, node, visited):
+    if node not in visited:
+        visited.append(node)
+        for n in graph[node]:
+             dfs(graph,n, visited)
+    return visited
+visited = dfs(graph1,'A', [])
+print(visited)
+
+Q.2) 4 Queen problem
+class QueenChessBoard: 
+    def init(self, size): 
+        self.size = size 
+        self.columns = [] 
+    def place_in_next_row(self, column): 
+        self.columns.append(column) 
+    def remove_in_current_row(self): 
+        return self.columns.pop() 
+    def is_this_column_safe_in_next_row(self, column): 
+        row = len(self.columns)
+        for queen_column in self.columns: 
+            if column == queen_column:
+                return False
+        for queen_row, queen_column in enumerate(self.columns): 
+            if queen_column - queen_row == column - row: 
+                return False 
+        for queen_row, queen_column in enumerate(self.columns): 
+            if ((self.size - queen_column) - queen_row == (self.size - column) - row): 
+                return False 
+        return True 
+    def display(self): 
+        for row in range(self.size): 
+            for column in range(self.size): 
+                if column == self.columns[row]: 
+                    print('Q', end=' ') 
+            else: 
+                    print('.', end=' ') 
+        print() 
+def solve_queen(size):
+    """Display a chessboard for each possible configuration of placing n queens on an n x n chessboard and print the number of such configurations.""" 
+    board = QueenChessBoard(size) 
+    number_of_solutions = 0 
+
+    row = 0 
+    column = 0 
+    while True: 
+        while column < size: 
+            if board.is_this_column_safe_in_next_row(column): 
+                board.place_in_next_row(column) 
+                row += 1 
+                column = 0 
+                break 
+            else:
+                column += 1 
+
+        if (column == size or row == size): 
+
+            if row == size: 
+                board.display() 
+                print() 
+                number_of_solutions += 1 
+                board.remove_in_current_row() 
+                row -= 1 
+            try: 
+                prev_column = board.remove_in_current_row() 
+            except IndexError: 
+                break 
+            row -= 1 
+            column = 1 + prev_column 
+    print('Number of solutions:', number_of_solutions) 
+n = int(input('Enter n: ')) 
+solve_queen(n)
+
+
+Slip 2
+Q.1) BFS:
+graph = {'A': set(['B', 'C']),
+         'B': set(['A', 'D', 'E']),
+         'C': set(['A', 'F']),
+         'D': set(['B']),
+         'E': set(['B', 'F']),
+         'F': set(['C', 'E'])
+         }
+def bfs(start):
+     queue = [start]
+     levels={} 
+     levels[start]=0 
+     visited = set(start)
+     while queue:
+         node = queue.pop(0)
+         neighbours=graph[node]
+         for neighbor in neighbours:
+             if neighbor not in visited:
+                 queue.append(neighbor)
+                 visited.add(neighbor)
+                 levels[neighbor]= levels[node]+1
+     print(levels) 
+     return visited
+print(str(bfs('A')))
+def bfs_paths(graph, start, goal):
+     queue = [(start, [start])]
+     while queue:
+         (vertex, path) = queue.pop(0)
+         for next in graph[vertex] - set(path):
+             if next == goal:
+                 yield path + [next]
+             else:
+                 queue.append((next, path + [next]))
+result=list(bfs_paths(graph, 'A', 'F'))
+print(result)
+def shortest_path(graph, start, goal):
+    try:
+        return next(bfs_paths(graph, start, goal))
+    except StopIteration:
+        return None
+result1=shortest_path(graph, 'A', 'F') 
+print(result1)
+
+Q.2) Water jug problem
+capacity = (12,8,5)
+x = capacity[0]
+y = capacity[1]
+z = capacity[2]
+memory = {}
+ans = []
+def get_all_states(state):
+    a = state[0]
+    b = state[1]
+    c = state[2]
+    if(a==6 and b==6):
+        ans.append(state)
+        return True
+    if((a,b,c) in memory):
+        return False
+    memory[(a,b,c)] = 1
+    if(a>0):
+ 
+        if(a+b<=y):
+            if( get_all_states((0,a+b,c)) ):
+                ans.append(state)
+                return True
+        else:
+            if( get_all_states((a-(y-b), y, c)) ):
+                ans.append(state)
+                return True
+        if(a+c<=z):
+             if( get_all_states((0,b,a+c)) ):
+                 ans.append(state)
+                 return True
+        else:
+             if( get_all_states((a-(z-c), b, z)) ):
+                 ans.append(state)
+                 return True
+    if(b>0):
+        if(a+b<=x):
+            if( get_all_states((a+b, 0, c)) ):
+                ans.append(state)
+                return True
+    else:
+         if( get_all_states((x, b-(x-a), c)) ):
+             ans.append(state)
+             return True
+    if(b+c<=z):
+        if( get_all_states((a, 0, b+c)) ):
+            ans.append(state)
+            return True
+    else:
+        if( get_all_states((a, b-(z-c), z)) ):
+            ans.append(state)
+            return True
+    if(c>0):
+        if(a+c<=x):
+            if( get_all_states((a+c, b, 0)) ):
+                ans.append(state)
+                return True
+        else:
+            if( get_all_states((x, b, c-(x-a))) ):
+                ans.append(state)
+                return True
+        if(b+c<=y):
+            if( get_all_states((a, b+c, 0)) ):
+                ans.append(state)
+                return True
+        else:
+            if( get_all_states((a, y, c-(y-b))) ):
+                ans.append(state)
+                return True
+    return False
+initial_state = (12,0,0)
+print("Starting work...\n")
+get_all_states(initial_state)
+ans.reverse()
+for i in ans:
+    print(i)
+
+
+Slip 3
+Q.1) N Queen problem refer slip 1 Q no-1
+Q.2)Travelling salesman problem.
+
+
+Slip 4
+Q.1) Tower of Hanoi
+def moveTower(height,fromPole, toPole, withPole):
+    if height >= 1:
+        moveTower(height-1,fromPole,withPole,toPole)
+        moveDisk(fromPole,toPole)
+        moveTower(height-1,withPole,toPole,fromPole)
+def moveDisk(fp,tp):
+    print("moving disk from",fp,"to",tp)
+moveTower(3,"A","B","C")
+
+Q.2)Block of words(Skipped)
+
+
+Slip 5
+
+Q.1) tic tac toe
+import os 
+import time 
+board = [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '] 
+player = 1  
+Win = 1 
+Draw = -1 
+Running = 0 
+Stop = 1  
+Game = Running 
+Mark = 'X'
+
